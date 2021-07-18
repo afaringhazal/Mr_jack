@@ -7,8 +7,9 @@ struct tile{
   int location;
   int direction;
   int hourglass;
-  int check;
-  int way;
+  int hide_identity;//When Mr. Jack selects a tile in the action lens
+  int way; //Used in the intuition phase and lens
+  int mr_jack;//The tile chosen for Mr. Jack
 
 };
 struct node
@@ -40,12 +41,16 @@ struct action{
 };
 struct action state[4];
 int random_action_card[4];
-
+int kk=0; //when the user wants to rotate a card twice in one round.
+int check2[4];//when the user wants to rotate a card twice in one round.
+int input_repeat_bug[4];//It is for the input bug, that when selecting the action, the user does not enter the used action
+int xx=0;//Control for input_repeat_bug
 void list_set_next();
 void identity_tile();
 void identity_cop();
 void identity_action();
 int hourglass(char *);
+int hourglass1=0;
 int location();
 int direction();
 void random_action();
@@ -61,6 +66,21 @@ int round=1;
 int number_state[4];//for function ,for better print
 int first=1;//for clear number_state[4] in function
 
+int location_mr_jack;
+
+
+// next phase -> Intuition
+void ways_pos();
+void ways_neg();
+//void intuition();
+void seen();
+void reverse_seen();
+void end();
+
+
+
+
+
 
 int main()
 {
@@ -75,13 +95,51 @@ random_action();
 print();
 printf("\n\n");
 
+srand(time(0));
+location_mr_jack=rand()%9+1;
+struct node *counter;
+    for(counter=head;counter!= NULL ;counter=counter->next)
+        if(counter->member.location==location_mr_jack)
+          counter->member.mr_jack=1;
+
 //game
+for(int q=0;q<4;q++)
+{round=1;
+first=1;
+ for(int i=0;i<4;i++)
+    check2[i]=0;
+ for(int i=0;i<4;i++)
+    number_state[i]=0;
+ for(int i=0;i<4;i++)
+    input_repeat_bug[i]=0;
+if(q!=0)
+ random_action();
+ xx=0;//control for input_repeat_bug
+
+ if(q!=0)
+ {ways_pos();
+  seen();
+  struct node *counter1;
+    for(counter1=head;counter1!= NULL ;counter1=counter1->next)
+        if(counter1->member.way==1)
+           counter1->member.way=2;
+ }
+
 while(round<=2)
-{if(round%2==0)
+{
+    for(int i=0;i<4;i++)
+    input_repeat_bug[i]=0;
+
+    if(round%2==0)
     {for(int i=0;i<4;i++)
      printf("%d\t%s\n",i+1,state[i].name[1-random_action_card[i]]);
+          xx=0;
         function(actor_Mr_jack);
-     function(actor_cop);function(actor_cop);
+          xx++;
+     function(actor_cop);
+          xx++;
+     function(actor_cop);
+          xx++;
      function(actor_Mr_jack);
      round++;
      continue;
@@ -89,13 +147,26 @@ while(round<=2)
  if(round%2==1)
  {for(int i=0;i<4;i++)
    printf("%d\t%s\n",i+1,state[i].name[random_action_card[i]]);
-     function(actor_cop);
- function(actor_Mr_jack);function(actor_Mr_jack);
+        xx=0;
+    function(actor_cop);
+        xx++;
+    function(actor_Mr_jack);
+        xx++;
+    function(actor_Mr_jack);
+        xx++;
  function(actor_cop);
  round++;
 continue;
 
- }}
+ }}}
+ ways_pos();
+ seen();
+ struct node *counter2;
+    for(counter2=head;counter2!= NULL ;counter2=counter2->next)
+        if(counter2->member.way==1)
+           counter2->member.way=2;
+   end();
+
 
 
 
@@ -129,8 +200,9 @@ list1 =fill_list(member1);
 
  struct node *counter;
   for(counter=head;counter!= NULL ;counter=counter->next)
-   {counter->member.check=0;
+   {counter->member.hide_identity=0;
     counter->member.way=0;
+    counter->member.mr_jack=0;
    }
 
 
@@ -175,11 +247,23 @@ for(int i=0;i<4;i++)
 
 void function(int actor)
 { int number;
+  int input_repeat_bug1;
     do{
+    input_repeat_bug1=0;
+
     scanf("%d",&number);
+
+    input_repeat_bug[xx]=number;
+    for(int i=xx-1;i>=0;i--)
+        if(number==input_repeat_bug[i])
+           input_repeat_bug1=1;
+
+     if(input_repeat_bug1==1)
+        printf("This action has been used before.\nEnter again plz.\n");
+
     if(number>4 || number<1)
         printf("Error!!!\nEnter again plz.");
-     }while(number>4 || number<1 );
+     }while(number>4 || number<1 || input_repeat_bug1==1);
         play_action_chase(state[number-1],number-1,actor);
     if(round==1)
        {number_state[number-1]=number;
@@ -202,9 +286,9 @@ if(round==2)
 
 void play_action_chase(struct action state1,int number,int actor)//the first phase,the chase section
 {  int i;
-    if(round==1)
+    if(round%2==1)
       i = random_action_card[number];
-    if(round==2)
+    if(round%2==0)
       i = 1- random_action_card[number];
 
 
@@ -217,12 +301,12 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
     struct node *counter;
     for(counter=head;counter!= NULL ;counter=counter->next)
      { if(i==m)
-        {if(counter->member.check!=1)
-          {counter->member.check=1;
+        {if(counter->member.hide_identity!=1)
+          {counter->member.hide_identity=1;
            number_tile--;
             break;
           }
-          if(counter->member.check==1)
+          if(counter->member.hide_identity==1)
            {m=rand()%(/*number_tile-way1*/9)+1;
              i=0;
             counter=head;
@@ -242,12 +326,12 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
     struct node *counter;
     for(counter=head;counter!= NULL ;counter=counter->next)
      {if(i==m)
-         {if(counter->member.check!=1)
-             {counter->member.way=1;
+         {if(counter->member.hide_identity!=1)
+             {counter->member.way=2;
                way1++;
                break;
              }
-         if(counter->member.check==1)
+         if(counter->member.hide_identity==1)
          {m=rand()%(/*number_tile*/9-way1)+1;
              counter=head;
              i=0;
@@ -286,20 +370,44 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
         print();
         return ;
     }
+   // static int k=0;
    if((strcmp(state1.name[i],"turn1")==0) || (strcmp(state1.name[i],"turn2")==0))
-    {printf("Which card do you choose to rotate?\(Enter name\)\n");
-     char rotate[10];
-      int check2=0;
-     do{
-         scanf("%s",rotate);
-         for(int i=0;i<9;i++)
+    {printf("Which card do you choose to rotate?\(Enter number 1 or 2 ... 9\)\n");
+     //char rotate[10];
+     int rotate;
+      //int check2[4];
+      int check22;
+     do{ check22=1;
+         //scanf("%s",rotate);
+         fflush(stdin);
+         scanf("%d",&rotate);//The token that is going to be rotated
+        // printf("rotate: %d\n",rotate);
+         check2[kk]=rotate;
+         check2[kk+2]=round; //The period in which the token rotates
+         //kk++;
+         //printf("%d\n",kk);
+
+         if(kk==1)
+         {//printf("doing 2 turn\n");
+           //printf("check2[0]:%d   check2[1]:%d check2[2]: %d  check2[3]:%d \n",check2[0],check2[1],check2[2],check2[3]);
+          if(check2[3]==check2[2])
+             {//printf("rounds is same\n");
+             if(check2[1]==check2[0])
+               {printf("Error!!!\nEnter again plz.\nYou can't rotate a card twice in one round.\n");
+                 check22=0;}}
+            kk=0;
+         }
+         /*for(int i=0;i<9;i++)
             if(strcmp(rotate,names[i])==0)
-               check2=1;
-         if(check2==0)
-           printf("Error!!!\nEnter again plz.\n");
+               check2=1;*/
+            if(rotate<1 || rotate>9)
+              printf("Error!!!\nEnter again plz.\nInvalid number.\n");
 
-       }while(check2==0);
+         /*if(check2==0)
+           printf("Error!!!\nEnter again plz.\n");*/
 
+       }while(check22==0 || rotate<1 ||rotate>9);
+    kk++;
     printf("How much do you want rotate?\n1\)90  2\)180 3\)270\n\(enter 1 or 2 or 3\)\n");
      int m;
      do{
@@ -310,7 +418,8 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
 
     struct node *counter;
     for(counter=head;counter!= NULL ;counter=counter->next)
-        {if(strcmp(counter->member.name,rotate)==0)
+        {if(counter->member.location == rotate)
+            //if(strcmp(counter->member.name,rotate)==0)
             {counter->member.direction+=m;
                if(counter->member.direction==5)
                  counter->member.direction=1;
@@ -327,43 +436,57 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
     }
 
    if(strcmp(state1.name[i],"swap")==0)
-     {printf("which cards do you want to swap?\(enter names\)\n");
-      char swap1[10];
-      char swap2[10];
-       int check3=0;
- do{scanf("%s",swap1);
-    for(int i=0;i<9;i++)
+     {printf("which cards do you want to swap?\(enter number 1 or 2 ... 9\)\n");
+     /* char swap1[10];
+      char swap2[10];*/
+      int swap1;
+      int swap2;
+      // int check3=0;
+ while(1)
+    {do{ fflush(stdin);
+    //scanf("%s",swap1);
+     scanf("%d",&swap1);
+    /*for(int i=0;i<9;i++)
     if(strcmp(swap1,names[i])==0)
-        check3=1;
-    if(check3==0)
-     printf("Error!!!\nEnter again plz.\n");
-    }while(check3==0);
-check3=0;
- do{scanf("%s",swap2);
-    for(int i=0;i<9;i++)
+        check3=1;*/
+    if(swap1<1 ||swap1>9)
+     printf("Error!!!\nEnter again plz.\nInvalid number.\n");
+    }while(swap1<1 ||swap1>9);
+//check3=0;
+ do{    fflush(stdin);
+        scanf("%d",&swap2);
+    //scanf("%s",swap2);
+    /*for(int i=0;i<9;i++)
         if(strcmp(swap2,names[i])==0)
-            check3=1;
-         if(check3==0)
+            check3=1;*/
+         if(swap2<1 ||swap2>9)
            printf("Error!!!\nEnter again plz.\n");
-    }while(check3==0);
+    }while(swap2<1 || swap2>9);
+    if(swap1!=swap2)
+        break;
+     else
+        printf("The two numbers entered are the same.\nEnter again plz.\n");
 
- int location1,location2;
+    }
+
+
+ char location1[10],location2[10];
        struct node *counter;
     for(counter=head;counter!= NULL ;counter=counter->next)
-       {if(strcmp(counter->member.name,swap1)==0)
-          location1=counter->member.location;
+       {if(counter->member.location==swap1)
+         strcpy(location1 , counter->member.name);
 
-        if(strcmp(counter->member.name,swap2)==0)
-          location2=counter->member.location;
+        if(counter->member.location==swap2)
+          strcpy(location2,counter->member.name);
         }
 
 
-      for(counter=head;counter!= NULL ;counter=counter->next)
-       {if(strcmp(counter->member.name,swap1)==0)
-          counter->member.location=location2;
+     for(counter=head;counter!= NULL ;counter=counter->next)
+       {if(strcmp(counter->member.name,location1)==0)
+          counter->member.location=swap2;
 
-        if(strcmp(counter->member.name,swap2)==0)
-          counter->member.location=location1;
+        if(strcmp(counter->member.name,location2)==0)
+          counter->member.location=swap1;
         }
        print();
        return;
@@ -372,7 +495,7 @@ check3=0;
 if(strcmp(state1.name[i],"cops")==0)
     {int m;
     if(actor==0)
-     {printf("enter 1\)Holmes  2\)Watson 3\)Toby 4\)don't change \(Enter number\)\n");
+     {printf("enter 1\)Holmes  2\)Watson 3\)Toby 4\)don't change \(Enter number 1 or 2 or 3 or 4\)\n");
         do{scanf("%d",&m);
             if(m>4 || m<1)
             printf("Wrong!!!\nEnter again:\n");
@@ -380,7 +503,7 @@ if(strcmp(state1.name[i],"cops")==0)
      }
 
       if(actor==1)
-             {printf("enter 1\)Holmes  2\)Watson 3\)Toby \(Enter number\) \n");
+             {printf("enter 1\)Holmes  2\)Watson 3\)Toby \(Enter number 1 or 2 or 3 \) \n");
                do{scanf("%d",&m);
                    if(m>3 || m<1)
                      printf("Wrong!!!\nEnter again:\n");
@@ -518,7 +641,7 @@ printf("\n");
   int n[9];
   int way2[9];
   int i=0;
-
+ //printf("m\n");
   struct node *counter;
   while(i!=9)
  {  for(counter=head;counter!= NULL;counter=counter->next)
@@ -526,6 +649,7 @@ printf("\n");
           {n[i] =counter->member.direction;
           way2[i]=counter->member.way;
         strcpy(m[i],counter->member.name);
+        //printf("n\n");
          i++;
          continue;
           }}
@@ -594,7 +718,7 @@ for(int j=p;j<p+3;j++)
          printf("***");
        if(n[j]==2 || n[j]==4||n[j]==3)
         printf("---");
-    if(way2[j]==1)
+    if(way2[j]==2)
         printf("   ");
      else
         printf("%s",m[j]);
@@ -668,7 +792,7 @@ if(n[j]==1||n[j]==2||n[j]==4)
     }
     printf("\n");}
 
-    printf("\n");
+   // printf("\n");
     p=p+3;
     }
 
@@ -691,8 +815,341 @@ if(n[j]==1||n[j]==2||n[j]==4)
 
 
 
+//next phase -> Intuition
 
 
+void ways_pos()
+{ int i;
+struct node *counter;
+   for(int j=0;j<3;j++)
+ {
+ if(cop[j].location_cop==1 || cop[j].location_cop==11 ||cop[j].location_cop==12)
+    {if(cop[j].location_cop==1)
+        i=1;
+    if(cop[j].location_cop==11)
+        i=7;
+    if(cop[j].location_cop==12)
+        i=4;
+
+        for(counter=head;counter!= NULL ;counter=counter->next)
+          {if(counter->member.location==i)
+           {if(counter->member.direction!=1)
+               {if(counter->member.way!=2)
+                 counter->member.way=1;
+                for(counter=head;counter!= NULL ;counter=counter->next)
+                   {if(counter->member.location==i+1)
+                      {if(counter->member.direction!=1)
+                        {if(counter->member.way!=2)
+                          counter->member.way=1;
+                          for(counter=head;counter!= NULL ;counter=counter->next)
+                           {if(counter->member.location==i+2)
+                             if(counter->member.direction!=1)
+                                if(counter->member.way!=2)
+                                   counter->member.way=1;
+                           }
+                           }}}}}}
+      }
+
+
+
+
+
+
+
+  if(cop[j].location_cop==2 || cop[j].location_cop==3 ||cop[j].location_cop==4)
+    {if(cop[j].location_cop==2)
+        i=1;
+    if(cop[j].location_cop==3)
+        i=2;
+    if(cop[j].location_cop==4)
+        i=3;
+
+        for(counter=head;counter!= NULL ;counter=counter->next)
+          {if(counter->member.location==i)
+           {if(counter->member.direction!=2)
+              {if(counter->member.way!=2)
+                counter->member.way=1;
+                for(counter=head;counter!= NULL ;counter=counter->next)
+                   {if(counter->member.location==i+3)
+                      {if(counter->member.direction!=2)
+                        {if(counter->member.way!=2)
+                          counter->member.way=1;
+                          for(counter=head;counter!= NULL ;counter=counter->next)
+                           {if(counter->member.location==i+6)
+                             if(counter->member.direction!=2)
+                                if(counter->member.way!=2)
+                                    counter->member.way=1;
+                           }
+                           }}}}}}
+      }
+
+
+
+
+
+if(cop[j].location_cop==5 || cop[j].location_cop==6 ||cop[j].location_cop==7)
+    {if(cop[j].location_cop==5)
+        i=3;
+    if(cop[j].location_cop==6)
+        i=6;
+    if(cop[j].location_cop==7)
+        i=9;
+
+        for(counter=head;counter!= NULL ;counter=counter->next)
+          {if(counter->member.location==i)
+           {if(counter->member.direction!=3)
+             {if(counter->member.way!=2)
+                 counter->member.way=1;
+                for(counter=head;counter!= NULL ;counter=counter->next)
+                   {if(counter->member.location==i-1)
+                      {if(counter->member.direction!=3)
+                         {if(counter->member.way!=2)
+                             counter->member.way=1;
+                          for(counter=head;counter!= NULL ;counter=counter->next)
+                           {if(counter->member.location==i-2)
+                             if(counter->member.direction!=3)
+                                if(counter->member.way!=2)
+                                    counter->member.way=1;
+                           }
+                           }}}}}}
+      }
+
+
+
+
+
+
+ if(cop[j].location_cop=8 || cop[j].location_cop==9 ||cop[j].location_cop==10)
+    {if(cop[j].location_cop==8)
+        i=9;
+    if(cop[j].location_cop==9)
+        i=8;
+    if(cop[j].location_cop==10)
+        i=7;
+
+        for(counter=head;counter!= NULL ;counter=counter->next)
+          {if(counter->member.location==i)
+           {if(counter->member.direction!=4)
+               {if(counter->member.way!=2)
+                   counter->member.way=1;
+                for(counter=head;counter!= NULL ;counter=counter->next)
+                   {if(counter->member.location==i-3)
+                      {if(counter->member.direction!=4)
+                         {if(counter->member.way!=2)
+                             counter->member.way=1;
+                          for(counter=head;counter!= NULL ;counter=counter->next)
+                           {if(counter->member.location==i-6)
+                             if(counter->member.direction!=4)
+                                if(counter->member.way!=2)
+                                    counter->member.way=1;
+                           }
+                           }}}}}}
+      }
+
+
+ }
+
+
+
+}
+
+
+
+void seen()
+{ int i=1;
+   struct node *counter;
+    for(counter=head;counter!= NULL ;counter=counter->next)
+        {if(counter->member.way==1)
+          {if(counter->member.mr_jack==1)
+             {printf("jack can be seen by detectives.\n");
+              reverse_seen();
+              ways_neg();
+             i=0;
+             break;
+             }
+          }
+          i++;
+
+         }
+
+        if(i!=0)
+            {hourglass1++;
+            printf("jack can not be seen by detectives.\n");
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+}
+void reverse_seen()
+{
+ struct node *counter;
+    for(counter=head;counter!= NULL ;counter=counter->next)
+        if(counter->member.way==0)
+           counter->member.way=1;
+}
+
+void ways_neg()
+{int i;
+struct node *counter;
+  for(int j=0;j<3;j++)
+  {
+    if(cop[j].location_cop==1 || cop[j].location_cop==11 ||cop[j].location_cop==12)
+    {if(cop[j].location_cop==1)
+        i=1;
+    if(cop[j].location_cop==11)
+        i=7;
+    if(cop[j].location_cop==12)
+        i=4;
+
+        for(counter=head;counter!= NULL ;counter=counter->next)
+          {if(counter->member.location==i)
+           {if(counter->member.direction!=1)
+               {if(counter->member.way!=2)
+                   counter->member.way=0;
+                for(counter=head;counter!= NULL ;counter=counter->next)
+                   {if(counter->member.location==i+1)
+                      {if(counter->member.direction!=1)
+                         {if(counter->member.way!=2)
+                             counter->member.way=0;
+                          for(counter=head;counter!= NULL ;counter=counter->next)
+                           {if(counter->member.location==i+2)
+                             if(counter->member.direction!=1)
+                                if(counter->member.way!=2)
+                                   counter->member.way=0;
+                           }
+                           }}}}}}
+      }
+
+
+
+
+
+
+
+  if(cop[j].location_cop==2 || cop[j].location_cop==3 ||cop[j].location_cop==4)
+    {if(cop[j].location_cop==2)
+        i=1;
+    if(cop[j].location_cop==3)
+        i=2;
+    if(cop[j].location_cop==4)
+        i=3;
+
+        for(counter=head;counter!= NULL ;counter=counter->next)
+          {if(counter->member.location==i)
+           {if(counter->member.direction!=2)
+               {if(counter->member.way!=2)
+                   counter->member.way=0;
+                for(counter=head;counter!= NULL ;counter=counter->next)
+                   {if(counter->member.location==i+3)
+                      {if(counter->member.direction!=2)
+                         {if(counter->member.way!=2)
+                             counter->member.way=0;
+                          for(counter=head;counter!= NULL ;counter=counter->next)
+                           {if(counter->member.location==i+6)
+                             if(counter->member.direction!=2)
+                                if(counter->member.way!=2)
+                                   counter->member.way=0;
+                           }
+                           }}}}}}
+      }
+
+
+
+
+
+if(cop[j].location_cop==5 || cop[j].location_cop==6 ||cop[j].location_cop==7)
+    {if(cop[j].location_cop==5)
+        i=3;
+    if(cop[j].location_cop==6)
+        i=6;
+    if(cop[j].location_cop==7)
+        i=9;
+
+        for(counter=head;counter!= NULL ;counter=counter->next)
+          {if(counter->member.location==i)
+           {if(counter->member.direction!=3)
+               {if(counter->member.way!=2)
+                   counter->member.way=0;
+                for(counter=head;counter!= NULL ;counter=counter->next)
+                   {if(counter->member.location==i-1)
+                      {if(counter->member.direction!=3)
+                         {if(counter->member.way!=2)
+                            counter->member.way=0;
+                          for(counter=head;counter!= NULL ;counter=counter->next)
+                           {if(counter->member.location==i-2)
+                             if(counter->member.direction!=3)
+                                 if(counter->member.way!=2)
+                                   counter->member.way=0;
+                           }
+                           }}}}}}
+      }
+
+
+
+
+
+
+ if(cop[j].location_cop=8 || cop[j].location_cop==9 ||cop[j].location_cop==10)
+    {if(cop[j].location_cop==8)
+        i=9;
+    if(cop[j].location_cop==9)
+        i=8;
+    if(cop[j].location_cop==10)
+        i=7;
+
+        for(counter=head;counter!= NULL ;counter=counter->next)
+          {if(counter->member.location==i)
+           {if(counter->member.direction!=4)
+               {if(counter->member.way!=2)
+                   counter->member.way=0;
+                for(counter=head;counter!= NULL ;counter=counter->next)
+                   {if(counter->member.location==i-3)
+                      {if(counter->member.direction!=4)
+                         {if(counter->member.way!=2)
+                             counter->member.way=0;
+                          for(counter=head;counter!= NULL ;counter=counter->next)
+                           {if(counter->member.location==i-6)
+                             if(counter->member.direction!=4)
+                                if(counter->member.way!=2)
+                                    counter->member.way=0;
+                           }
+                           }}}}}}
+      }
+
+
+
+
+
+
+
+
+}}
+
+
+void end()
+{int n=0;
+struct node *counter;
+    for(counter=head;counter!= NULL ;counter=counter->next)
+        if(counter->member.way==2)
+         n++;
+   if(n==8)
+        printf("Detectives is win.\nEND;\)\n");
+   else
+    printf("Mr jack is win.\nEND :\)\n");
+
+
+
+
+}
 
 
 
