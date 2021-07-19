@@ -69,7 +69,7 @@ int first=1;//for clear number_state[4] in function
 int location_mr_jack;
 
 
-// next phase -> Intuition :
+// next phase -> Intuition
 void ways_pos();
 void ways_neg();
 //void intuition();
@@ -95,16 +95,41 @@ random_action();
 print();
 printf("\n\n");
 
-srand(time(0));
+srand(time(0)*time(0));
+//I want it to be non-linear because if it is linear i have the possibility of repeating the name of the Mr jack in every game
 location_mr_jack=rand()%9+1;
 struct node *counter;
     for(counter=head;counter!= NULL ;counter=counter->next)
         if(counter->member.location==location_mr_jack)
-          counter->member.mr_jack=1;
+          {counter->member.mr_jack=1;
+          printf("Mr.jack is :%s\n",counter->member.name);}
+
+
+
 
 //game
 for(int q=0;q<4;q++)
-{round=1;
+{if(hourglass1>=6)
+   {printf("Mr.jack wins because he has 6 hourglasses.\nEnd.\n");
+    return 0;
+    }
+
+    int z=0;
+    struct node *counter21;
+    for(counter21=head;counter21!= NULL ;counter21=counter21->next)
+        if(counter21->member.way==2)
+          z++;
+    if(z==8)
+     {printf("detectives are win. \nfind Mr.jack.\nEnd.\n");
+     return 0;}
+
+
+
+
+
+
+
+round=1;
 first=1;
  for(int i=0;i<4;i++)
     check2[i]=0;
@@ -123,10 +148,39 @@ if(q!=0)
     for(counter1=head;counter1!= NULL ;counter1=counter1->next)
         if(counter1->member.way==1)
            counter1->member.way=2;
+    print();
  }
 
 while(round<=2)
-{
+{if(hourglass1>=6)
+   {printf("Mr.jack wins because he has 6 hourglasses.\nEnd.\n");
+    return 0;
+    }
+
+    int b=0;
+    struct node *counter22;
+    for(counter22=head;counter22!= NULL ;counter22=counter22->next)
+        if(counter22->member.way==2)
+          b++;
+    if(b==8)
+     {printf("detectives are win. \nfind Mr.jack.\nEnd.\n");
+     return 0;}
+
+
+
+if(round==2)
+  {
+//if(q!=0)
+  ways_pos();
+  seen();
+  struct node *counter1;
+    for(counter1=head;counter1!= NULL ;counter1=counter1->next)
+        if(counter1->member.way==1)
+           counter1->member.way=2;
+    print();
+  }
+
+
     for(int i=0;i<4;i++)
     input_repeat_bug[i]=0;
 
@@ -134,12 +188,16 @@ while(round<=2)
     {for(int i=0;i<4;i++)
      printf("%d\t%s\n",i+1,state[i].name[1-random_action_card[i]]);
           xx=0;
+          printf("play Mr.jack\(Enter number plz\):\n");
         function(actor_Mr_jack);
           xx++;
+          printf("play detectives\(Enter number plz\):\n");
      function(actor_cop);
           xx++;
+          printf("play detectives\(Enter number plz\):\n");
      function(actor_cop);
           xx++;
+         printf("play Mr.jack\(Enter number plz\):\n");
      function(actor_Mr_jack);
      round++;
      continue;
@@ -148,13 +206,17 @@ while(round<=2)
  {for(int i=0;i<4;i++)
    printf("%d\t%s\n",i+1,state[i].name[random_action_card[i]]);
         xx=0;
+        printf("play detectives\(Enter number plz\):\n");
     function(actor_cop);
         xx++;
+        printf("play Mr.jack\(Enter number plz\):\n");
     function(actor_Mr_jack);
         xx++;
+        printf("play Mr.jack\(Enter number plz\):\n");
     function(actor_Mr_jack);
         xx++;
- function(actor_cop);
+        printf("play detectives\(Enter number plz\):\n");
+   function(actor_cop);
  round++;
 continue;
 
@@ -298,7 +360,7 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
      char name_lens[9][10];
     struct node *counter;
     for(counter=head;counter!= NULL ;counter=counter->next)
-        if(counter->member.way!=2)
+        //if(counter->member.way!=2)
           if(counter->member.hide_identity!=1)
             if(counter->member.mr_jack!=1)
              {strcpy(name_lens[k],counter->member.name);
@@ -326,7 +388,7 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
      char name_lens1[9][10];
     struct node *counter;
     for(counter=head;counter!= NULL ;counter=counter->next)
-        if(counter->member.way!=2)
+        //if(counter->member.way!=2)
           if(counter->member.hide_identity!=1)
             if(counter->member.mr_jack!=1)
              {strcpy(name_lens1[k],counter->member.name);
@@ -338,7 +400,7 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
     //struct node *counter;
     for(counter=head;counter!= NULL ;counter=counter->next)
      { if(strcmp(name_lens1[m],counter->member.name)==0)
-           {
+           {counter->member.hide_identity=1;
             counter->member.way=2;
             printf("The person selected in this action %s\n",name_lens1[m]);
             }
@@ -532,23 +594,23 @@ void list_set_next()
 }
 
 int hourglass(char *name)
-{ if(strcmp(name,"I_L"))
+{ if(strcmp(name,"I_L")==0)
     return 0;
-  if(strcmp(name,"J_B"))
+  if(strcmp(name,"J_B")==0)
      return 1;
-  if(strcmp(name,"J_P"))
+  if(strcmp(name,"J_P")==0)
    return 1;
-  if(strcmp(name,"J_S"))
+  if(strcmp(name,"J_S")==0)
    return 1;
-  if(strcmp(name,"J_L"))
+  if(strcmp(name,"J_L")==0)
    return 1;
-  if(strcmp(name,"Mad"))
+  if(strcmp(name,"Mad")==0)
    return 2;
-  if(strcmp(name,"M_S"))
+  if(strcmp(name,"M_S")==0)
    return 1;
-  if(strcmp(name,"S_G"))
+  if(strcmp(name,"S_G")==0)
    return 0;
-  if(strcmp(name,"W_G"))
+  if(strcmp(name,"W_G")==0)
    return 1;
 }
 
@@ -767,7 +829,8 @@ struct node *counter02;
    for(int j=0;j<3;j++)
  {
  if(cop[j].location_cop==1 || cop[j].location_cop==11 ||cop[j].location_cop==12)
-    {if(cop[j].location_cop==1)
+    {
+    if(cop[j].location_cop==1)
         i=1;
     if(cop[j].location_cop==11)
         i=7;
@@ -778,17 +841,19 @@ struct node *counter02;
           {if(counter->member.location==i)
            {if(counter->member.direction!=1)
                {if(counter->member.way!=2)
-                 counter->member.way=1;
+                  counter->member.way=1;
                 for(counter01=head;counter01!= NULL ;counter01=counter01->next)
                    {if(counter01->member.location==i+1)
-                      {if(counter01->member.direction!=1)
+                      {if(counter->member.direction!=3 && counter01->member.direction!=1)
                         {if(counter01->member.way!=2)
                           counter01->member.way=1;
                           for(counter02=head;counter02!= NULL ;counter02=counter02->next)
                            {if(counter02->member.location==i+2)
-                             if(counter02->member.direction!=1)
+                             if(counter02->member.direction!=1 && counter01->member.direction!=3)
                                 if(counter02->member.way!=2)
                                    counter02->member.way=1;
+
+
                            }
                            }}}}}}
       }
@@ -814,12 +879,12 @@ struct node *counter02;
                 counter->member.way=1;
                 for(counter01=head;counter01!= NULL ;counter01=counter01->next)
                    {if(counter01->member.location==i+3)
-                      {if(counter01->member.direction!=2)
+                      {if(counter01->member.direction!=2 && counter->member.direction!=4)
                         {if(counter01->member.way!=2)
                           counter01->member.way=1;
                           for(counter02=head;counter02!= NULL ;counter02=counter02->next)
                            {if(counter02->member.location==i+6)
-                             if(counter02->member.direction!=2)
+                             if(counter02->member.direction!=2 && counter01->member.direction!=4)
                                 if(counter02->member.way!=2)
                                     counter02->member.way=1;
                            }
@@ -845,12 +910,12 @@ if(cop[j].location_cop==5 || cop[j].location_cop==6 ||cop[j].location_cop==7)
                  counter->member.way=1;
                 for(counter01=head;counter01!= NULL ;counter01=counter01->next)
                    {if(counter01->member.location==i-1)
-                      {if(counter01->member.direction!=3)
+                      {if(counter01->member.direction!=3 && counter->member.direction!=1)
                          {if(counter01->member.way!=2)
                              counter01->member.way=1;
                           for(counter02=head;counter02!= NULL ;counter02=counter02->next)
                            {if(counter02->member.location==i-2)
-                             if(counter02->member.direction!=3)
+                             if(counter02->member.direction!=3 && counter01->member.direction!=1)
                                 if(counter02->member.way!=2)
                                     counter02->member.way=1;
                            }
@@ -862,7 +927,7 @@ if(cop[j].location_cop==5 || cop[j].location_cop==6 ||cop[j].location_cop==7)
 
 
 
- if(cop[j].location_cop=8 || cop[j].location_cop==9 ||cop[j].location_cop==10)
+ if(cop[j].location_cop==8 || cop[j].location_cop==9 ||cop[j].location_cop==10)
     {if(cop[j].location_cop==8)
         i=9;
     if(cop[j].location_cop==9)
@@ -877,12 +942,12 @@ if(cop[j].location_cop==5 || cop[j].location_cop==6 ||cop[j].location_cop==7)
                    counter->member.way=1;
                 for(counter01=head;counter01!= NULL ;counter01=counter01->next)
                    {if(counter01->member.location==i-3)
-                      {if(counter01->member.direction!=4)
+                      {if(counter01->member.direction!=4 && counter->member.direction!=2)
                          {if(counter01->member.way!=2)
                              counter01->member.way=1;
                           for(counter02=head;counter02!= NULL ;counter02=counter02->next)
                            {if(counter02->member.location==i-6)
-                             if(counter02->member.direction!=4)
+                             if(counter02->member.direction!=4 && counter01->member.direction!=2)
                                 if(counter02->member.way!=2)
                                     counter02->member.way=1;
                            }
@@ -918,6 +983,7 @@ void seen()
         if(i!=0)
             {hourglass1++;
             printf("jack can not be seen by detectives.\n");
+            printf("hourglass for jack is : %d\n",hourglass1);
             }
 
 
@@ -962,12 +1028,12 @@ struct node *counter02;
                    counter->member.way=0;
                 for(counter01=head;counter01!= NULL ;counter01=counter01->next)
                    {if(counter01->member.location==i+1)
-                      {if(counter01->member.direction!=1)
+                      {if(counter01->member.direction!=1 && counter->member.direction!=3)
                          {if(counter01->member.way!=2)
                              counter01->member.way=0;
                           for(counter02=head;counter02!= NULL ;counter02=counter02->next)
                            {if(counter02->member.location==i+2)
-                             if(counter02->member.direction!=1)
+                             if(counter02->member.direction!=1 && counter01->member.direction!=3)
                                 if(counter02->member.way!=2)
                                    counter02->member.way=0;
                            }
@@ -995,12 +1061,12 @@ struct node *counter02;
                    counter->member.way=0;
                 for(counter01=head;counter01!= NULL ;counter01=counter01->next)
                    {if(counter01->member.location==i+3)
-                      {if(counter01->member.direction!=2)
+                      {if(counter01->member.direction!=2 && counter->member.direction!=4)
                          {if(counter01->member.way!=2)
                              counter01->member.way=0;
                           for(counter02=head;counter02!= NULL ;counter02=counter02->next)
                            {if(counter02->member.location==i+6)
-                             if(counter02->member.direction!=2)
+                             if(counter02->member.direction!=2 && counter01->member.direction!=4)
                                 if(counter02->member.way!=2)
                                    counter02->member.way=0;
                            }
@@ -1026,12 +1092,12 @@ if(cop[j].location_cop==5 || cop[j].location_cop==6 ||cop[j].location_cop==7)
                    counter->member.way=0;
                 for(counter01=head;counter01!= NULL ;counter01=counter01->next)
                    {if(counter01->member.location==i-1)
-                      {if(counter01->member.direction!=3)
+                      {if(counter01->member.direction!=3 && counter->member.direction!=1)
                          {if(counter01->member.way!=2)
                             counter01->member.way=0;
                           for(counter02=head;counter02!= NULL ;counter02=counter02->next)
                            {if(counter02->member.location==i-2)
-                             if(counter02->member.direction!=3)
+                             if(counter02->member.direction!=3 &&counter01->member.direction!=1)
                                  if(counter02->member.way!=2)
                                    counter02->member.way=0;
                            }
@@ -1043,7 +1109,7 @@ if(cop[j].location_cop==5 || cop[j].location_cop==6 ||cop[j].location_cop==7)
 
 
 
- if(cop[j].location_cop=8 || cop[j].location_cop==9 ||cop[j].location_cop==10)
+ if(cop[j].location_cop==8 || cop[j].location_cop==9 ||cop[j].location_cop==10)
     {if(cop[j].location_cop==8)
         i=9;
     if(cop[j].location_cop==9)
@@ -1058,12 +1124,12 @@ if(cop[j].location_cop==5 || cop[j].location_cop==6 ||cop[j].location_cop==7)
                    counter->member.way=0;
                 for(counter01=head;counter01!= NULL ;counter01=counter01->next)
                    {if(counter01->member.location==i-3)
-                      {if(counter01->member.direction!=4)
+                      {if(counter01->member.direction!=4 && counter->member.direction!=2)
                          {if(counter01->member.way!=2)
                              counter01->member.way=0;
                           for(counter02=head;counter02!= NULL ;counter02=counter02->next)
                            {if(counter02->member.location==i-6)
-                             if(counter02->member.direction!=4)
+                             if(counter02->member.direction!=4 && counter01->member.direction!=2)
                                 if(counter02->member.way!=2)
                                     counter02->member.way=0;
                            }
