@@ -77,15 +77,13 @@ void seen();
 void reverse_seen();
 void end();
 
-
-
-
+//finish game
 
 
 int main()
 {
-    int actor_Mr_jack=0;
-    int actor_cop=1;
+int actor_Mr_jack=0;
+int actor_cop=1;
 
 identity_tile();
 identity_cop();
@@ -113,22 +111,6 @@ for(int q=0;q<4;q++)
    {printf("Mr.jack wins because he has 6 hourglasses.\nEnd.\n");
     return 0;
     }
-
-    int z=0;
-    struct node *counter21;
-    for(counter21=head;counter21!= NULL ;counter21=counter21->next)
-        if(counter21->member.way==2)
-          z++;
-    if(z==8)
-     {printf("detectives are win. \nfind Mr.jack.\nEnd.\n");
-     return 0;}
-
-
-
-
-
-
-
 round=1;
 first=1;
  for(int i=0;i<4;i++)
@@ -151,24 +133,24 @@ if(q!=0)
     print();
  }
 
-while(round<=2)
-{if(hourglass1>=6)
+ if(hourglass1>=6)
    {printf("Mr.jack wins because he has 6 hourglasses.\nEnd.\n");
     return 0;
     }
 
-    int b=0;
-    struct node *counter22;
-    for(counter22=head;counter22!= NULL ;counter22=counter22->next)
-        if(counter22->member.way==2)
-          b++;
-    if(b==8)
+
+ int z=0;
+    struct node *counter21;
+    for(counter21=head;counter21!= NULL ;counter21=counter21->next)
+        if(counter21->member.way==2)
+          z++;
+    if(z==8)
      {printf("detectives are win. \nfind Mr.jack.\nEnd.\n");
      return 0;}
 
 
-
-if(round==2)
+while(round<=2)
+{if(round==2)
   {
 //if(q!=0)
   ways_pos();
@@ -181,11 +163,26 @@ if(round==2)
   }
 
 
+  if(hourglass1>=6)
+   {printf("Mr.jack wins because he has 6 hourglasses.\nEnd.\n");
+    return 0;
+    }
+   int b=0;
+    struct node *counter22;
+    for(counter22=head;counter22!= NULL ;counter22=counter22->next)
+        if(counter22->member.way==2)
+          b++;
+    if(b==8)
+     {printf("detectives are win. \nfind Mr.jack.\nEnd.\n");
+     return 0;}
+
+
     for(int i=0;i<4;i++)
     input_repeat_bug[i]=0;
 
     if(round%2==0)
-    {for(int i=0;i<4;i++)
+    {printf("round :%d\n",2*q+round);
+    for(int i=0;i<4;i++)
      printf("%d\t%s\n",i+1,state[i].name[1-random_action_card[i]]);
           xx=0;
           printf("play Mr.jack\(Enter number plz\):\n");
@@ -203,7 +200,8 @@ if(round==2)
      continue;
      }
  if(round%2==1)
- {for(int i=0;i<4;i++)
+ {printf("round :%d\n",2*q+round);
+    for(int i=0;i<4;i++)
    printf("%d\t%s\n",i+1,state[i].name[random_action_card[i]]);
         xx=0;
         printf("play detectives\(Enter number plz\):\n");
@@ -234,6 +232,7 @@ continue;
 
 
 }
+
 
 void identity_tile()
 {
@@ -324,7 +323,7 @@ void function(int actor)
         printf("This action has been used before.\nEnter again plz.\n");
 
     if(number>4 || number<1)
-        printf("Error!!!\nEnter again plz.");
+        printf("Error!!!\nEnter again plz.\n");
      }while(number>4 || number<1 || input_repeat_bug1==1);
         play_action_chase(state[number-1],number-1,actor);
     if(round==1)
@@ -551,11 +550,18 @@ if(strcmp(state1.name[i],"cops")==0)
              }
 
         if(m==1)
-            cop[0].location_cop+=1;
-        if(m==2)
-            cop[1].location_cop+=1;
+            {cop[0].location_cop+=1;
+             if(cop[0].location_cop>12)
+             cop[0].location_cop-=12;}
+
+            if(m==2)
+            {cop[1].location_cop+=1;
+            if(cop[1].location_cop>12)
+             cop[1].location_cop-=12;}
          if(m==3)
-            cop[2].location_cop+=1;
+            {cop[2].location_cop+=1;
+            if(cop[2].location_cop>12)
+             cop[2].location_cop-=12;}
 
 
         print();
@@ -644,20 +650,52 @@ int direction()
 
 void print()
 { int p = 0;
-   for(int i=0;i<32;i++)
+   for(int i=0;i<41;i++)
         printf("_");
         printf("\n");
 
 for(int i=2;i<=4;i++)
     {printf("      ");
+     int z=0;
   if(cop[0].location_cop==i)
-     printf("HOL");
-   else if(cop[1].location_cop==i)
+     {printf("HOL");
+    z++;
+     //printf("\n");
+     }
+
+
+    if(cop[1].location_cop==i)
+     {if(z!=0)
+      {printf("\n");
+      if(i==2)
+        printf("      ");
+       if(i==3)
+        printf("               ");
+        if(i==4)
+        printf("                        ");
+      }
+
      printf("WAT");
-  else if(cop[2].location_cop==i)
-     printf("TOB");
-     else
-        printf("   ");}
+     z++;
+     //printf("\n");
+     }
+
+   if(cop[2].location_cop==i)
+     {if(z!=0)
+      {printf("\n");
+      if(i==2)
+        printf("      ");
+       if(i==3)
+        printf("               ");
+        if(i==4)
+            printf("                        ");
+      }printf("TOB");
+     //printf("\n");
+     z++;
+     }
+     if(cop[0].location_cop!=i && cop[1].location_cop!=i && cop[2].location_cop!=i)
+        printf("   ");
+    }
 
 printf("\n");
   char m[9][10];
@@ -697,32 +735,56 @@ while(p!=9)
     }
     printf("\n");}
 
+   int e=0;
+
+
     if(cop[0].location_cop==1 && p==0)
-     printf("HOL");
-    if(cop[1].location_cop==1&& p==0)
-     printf("WAT");
+     {printf("HOL");
+     e++;}
+     if(cop[1].location_cop==1&& p==0)
+      if(e==0)
+        {printf("WAT");
+        e++;
+        e++;
+        }
     if(cop[2].location_cop==1 && p==0)
-     printf("TOB");
+        if(e==0)
+       {printf("TOB");
+         //e++;
+         }
      if(cop[0].location_cop!=1 && cop[1].location_cop!=1 && cop[2].location_cop!=1 && p==0)
          printf("   ");
 
+  int e1=0;
 
   if(cop[0].location_cop==11 && p==6)
-     printf("HOL");
+     {printf("HOL");
+     e1++;}
   if(cop[1].location_cop==11&&p==6)
-     printf("WAT");
+     if(e1==0)
+         {printf("WAT");
+         e1++;
+         e1++;
+         }
   if(cop[2].location_cop==11&& p==6)
+    if(e1==0)
      printf("TOB");
   if(cop[0].location_cop!=11 && cop[1].location_cop!=11 && cop[2].location_cop!=11 && p==6)
         printf("   ");
 
-
+int e2=0;
     if(cop[0].location_cop ==12 && p==3)
-     printf("HOL");
+     {printf("HOL");
+     e2++;}
     if(cop[1].location_cop ==12 && p==3)
-     printf("WAT");
+        if(e2==0)
+         {printf("WAT");
+         e2++;
+         e2++;
+         }
     if(cop[2].location_cop==12  && p==3)
-     printf("TOB");
+        if(e2==0)
+          printf("TOB");
      if(cop[0].location_cop!=12 && cop[1].location_cop!=12 && cop[2].location_cop!=12 && p==3)
         printf("   ");
 
@@ -746,39 +808,161 @@ if(n[j]==1||n[j]==2||n[j]==4)
 
 
     if(cop[0].location_cop==5 && p==0)
-     printf("HOL");
+     printf("HOL ");
     if(cop[1].location_cop==5&& p==0)
-     printf("WAT");
+     printf("WAT ");
     if(cop[2].location_cop==5 && p==0)
-     printf("TOB");
+     printf("TOB ");
      if(cop[0].location_cop!=5 && cop[1].location_cop!=5 && cop[2].location_cop!=5 && p==0)
          printf("   ");
 
 
   if(cop[0].location_cop==7 && p==6)
-     printf("HOL");
+     printf("HOL ");
   if(cop[1].location_cop==7&&p==6)
-     printf("WAT");
+     printf("WAT ");
   if(cop[2].location_cop==7&& p==6)
-     printf("TOB");
+     printf("TOB ");
   if(cop[0].location_cop!=7 && cop[1].location_cop!=7 && cop[2].location_cop!=7 && p==6)
         printf("   ");
 
 
     if(cop[0].location_cop ==6 && p==3)
-     printf("HOL");
+     printf("HOL ");
     if(cop[1].location_cop ==6 && p==3)
-     printf("WAT");
+     printf("WAT ");
     if(cop[2].location_cop==6  && p==3)
-     printf("TOB");
+     printf("TOB ");
      if(cop[0].location_cop!=6 && cop[1].location_cop!=6 && cop[2].location_cop!=6 && p==3)
         printf("   ");
 
 
     printf("\n");
+  if(e==1)
+    {if(cop[1].location_cop==1&& p==0)
+        {printf("WAT");
+        e++;
+        e++;
+        }
+    if(cop[2].location_cop==1 && p==0)
+        if(e==1)
+       {printf("TOB");
+         //e++;
+        }
+     if(cop[1].location_cop!=1 && cop[2].location_cop!=1 && p==0)
+         printf("   ");
+    }
 
-    for(int k=0;k<3;k++)
-    {printf("   ");
+   if(e==2)
+   {if(cop[2].location_cop==1 && p==0)
+       {printf("TOB");
+         //e++;
+        }
+     if(cop[2].location_cop!=1 && p==0)
+         printf("   ");
+     }
+
+
+
+ if(e1==1)
+    {if(cop[1].location_cop==11&& p==6)
+        {printf("WAT");
+        e1++;
+        e1++;
+        }
+    if(cop[2].location_cop==11 && p==6)
+        if(e1==1)
+       {printf("TOB");
+         //e++;
+        }
+     if(cop[1].location_cop!=11 && cop[2].location_cop!=11 && p==6)
+         printf("   ");
+    }
+    if(e1==2)
+   {if(cop[2].location_cop==11 && p==6)
+       {printf("TOB");
+         //e++;
+        }
+     if(cop[2].location_cop!=11 && p==6)
+         printf("   ");
+     }
+
+
+
+if(e2==1)
+    {if(cop[1].location_cop==12&& p==3)
+        {printf("WAT");
+        e2++;
+        e2++;
+        }
+    if(cop[2].location_cop==12 && p==3)
+        if(e2==1)
+       {printf("TOB");
+         //e++;
+        }
+     if(cop[1].location_cop!=12 && cop[2].location_cop!=12 && p==3)
+         printf("   ");
+    }
+
+     if(e2==2)
+   {if(cop[2].location_cop==12 && p==3)
+       {printf("TOB");
+         //e++;
+        }
+     if(cop[2].location_cop!=12 && p==3)
+         printf("   ");
+     }
+
+if(e!=1 && e!=2 && e!=3 && p==0)
+    printf("   ");
+if(e1!=1 &&e1!=2 &&e1!=3 && p==6)
+    printf("   ");
+ if(e2!=1&& e2!=2 &&e2 !=3 && p==3)
+    printf("   ");
+
+
+
+
+  for(int k=0;k<3;k++)
+    {if(k!=0 && k!=1)
+        printf("   ");
+    if(k==1 && e==3)
+       {if(cop[2].location_cop==1 && p==0)
+            printf("TOB");
+
+       else
+            printf("   ");}
+
+
+
+    if(k==1 && e1==3)
+       {if(cop[2].location_cop==11 && p==6)
+            printf("TOB");
+
+       else
+            printf("   ");}
+
+
+
+    if(k==1 && e2==3)
+       {if(cop[2].location_cop==12 && p==3)
+            printf("TOB");
+
+       else
+            printf("   ");}
+
+
+
+    if(k==1 && e!=3 && p==0)
+         printf("   ");
+
+    if(k==1 && e1!=3 && p==6)
+         printf("   ");
+
+    if(k==1 && e2!=3 && p==3)
+         printf("   ");
+
+
      for(int j=p;j<p+3;j++)
          {printf("   ");
           printf(" ");
@@ -1153,9 +1337,9 @@ struct node *counter;
         if(counter->member.way==2)
          n++;
    if(n==8)
-        printf("Detectives is win.\nEND;\)\n");
+        printf("Detectives is win.\nEnd\n");
    else
-    printf("Mr jack is win.\nEND :\)\n");
+    printf("Mr jack is win.\nEnd\n");
 
 
 
