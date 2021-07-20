@@ -2,6 +2,8 @@
 #include<stdlib.h>
 #include<time.h>
 #include<string.h>
+#include<windows.h>
+
 struct tile{
   char name[10];
   int location;
@@ -78,9 +80,26 @@ void reverse_seen();
 void end();
 
 //finish game
-
+void play_game();
+void save_game(int);
+int control=0;//for control game names
 
 int main()
+{printf("Welcome to Mr. Jack\n");
+printf("1- New Game\n2- Load Game \n3- Exit\n");
+int ans;
+scanf("%d",&ans);
+  if(ans==1)
+     play_game();
+
+
+
+
+
+
+}
+
+void play_game()
 {
 int actor_Mr_jack=0;
 int actor_cop=1;
@@ -107,10 +126,10 @@ struct node *counter;
 
 //game
 for(int q=0;q<4;q++)
-{if(hourglass1>=6)
+{/*if(hourglass1>=6)
    {printf("Mr.jack wins because he has 6 hourglasses.\nEnd.\n");
     return 0;
-    }
+    }*/
 round=1;
 first=1;
  for(int i=0;i<4;i++)
@@ -123,7 +142,7 @@ if(q!=0)
  random_action();
  xx=0;//control for input_repeat_bug
 
- if(q!=0)
+ /*if(q!=0)
  {ways_pos();
   seen();
   struct node *counter1;
@@ -131,9 +150,9 @@ if(q!=0)
         if(counter1->member.way==1)
            counter1->member.way=2;
     print();
- }
+ }*/
 
- if(hourglass1>=6)
+ /*if(hourglass1>=6)
    {printf("Mr.jack wins because he has 6 hourglasses.\nEnd.\n");
     return 0;
     }
@@ -146,13 +165,12 @@ if(q!=0)
           z++;
     if(z==8)
      {printf("detectives are win. \nfind Mr.jack.\nEnd.\n");
-     return 0;}
+     return 0;}*/
 
 
 while(round<=2)
-{if(round==2)
+{/*if(round==2)
   {
-//if(q!=0)
   ways_pos();
   seen();
   struct node *counter1;
@@ -160,14 +178,14 @@ while(round<=2)
         if(counter1->member.way==1)
            counter1->member.way=2;
     print();
-  }
+  }*/
 
 
-  if(hourglass1>=6)
+  /*if(hourglass1>=6)
    {printf("Mr.jack wins because he has 6 hourglasses.\nEnd.\n");
     return 0;
-    }
-   int b=0;
+    }*/
+   /*int b=0;
     struct node *counter22;
     for(counter22=head;counter22!= NULL ;counter22=counter22->next)
         if(counter22->member.way==2)
@@ -175,31 +193,13 @@ while(round<=2)
     if(b==8)
      {printf("detectives are win. \nfind Mr.jack.\nEnd.\n");
      return 0;}
-
+*/
 
     for(int i=0;i<4;i++)
     input_repeat_bug[i]=0;
 
-    if(round%2==0)
-    {printf("round :%d\n",2*q+round);
-    for(int i=0;i<4;i++)
-     printf("%d\t%s\n",i+1,state[i].name[1-random_action_card[i]]);
-          xx=0;
-          printf("play Mr.jack\(Enter number plz\):\n");
-        function(actor_Mr_jack);
-          xx++;
-          printf("play detectives\(Enter number plz\):\n");
-     function(actor_cop);
-          xx++;
-          printf("play detectives\(Enter number plz\):\n");
-     function(actor_cop);
-          xx++;
-         printf("play Mr.jack\(Enter number plz\):\n");
-     function(actor_Mr_jack);
-     round++;
-     continue;
-     }
- if(round%2==1)
+
+if(round==1)
  {printf("round :%d\n",2*q+round);
     for(int i=0;i<4;i++)
    printf("%d\t%s\n",i+1,state[i].name[random_action_card[i]]);
@@ -215,10 +215,92 @@ while(round<=2)
         xx++;
         printf("play detectives\(Enter number plz\):\n");
    function(actor_cop);
+
+ ways_pos();
+  seen();
+  struct node *counter1;
+    for(counter1=head;counter1!= NULL ;counter1=counter1->next)
+        if(counter1->member.way==1)
+           counter1->member.way=2;
+    print();
+
+
+    int b=0;
+    struct node *counter22;
+    for(counter22=head;counter22!= NULL ;counter22=counter22->next)
+        if(counter22->member.way==2)
+          b++;
+    if(b==8)
+     {printf("detectives are win. \nfind Mr.jack.\nEnd.\n");
+     return 0;}
+
+    if(hourglass1>=6)
+   {printf("Mr.jack wins because he has 6 hourglasses.\nEnd.\n");
+    return 0;
+    }
+
+   printf("Do you want to save the game?(if yes enter 1 else enter 0)\n");
+   int ans1;
+   scanf("%d",&ans1);
+   if(ans1==1)
+     {save_game(q);
+      system("cls");
+      printf("The game was successfully saved.\n");
+      return ;}
  round++;
 continue;
 
- }}}
+ }
+
+if(round%2==0)
+  {printf("round :%d\n",2*q+round);
+    for(int i=0;i<4;i++)
+     printf("%d\t%s\n",i+1,state[i].name[1-random_action_card[i]]);
+          xx=0;
+          printf("play Mr.jack\(Enter number plz\):\n");
+        function(actor_Mr_jack);
+          xx++;
+          printf("play detectives\(Enter number plz\):\n");
+     function(actor_cop);
+          xx++;
+          printf("play detectives\(Enter number plz\):\n");
+     function(actor_cop);
+          xx++;
+         printf("play Mr.jack\(Enter number plz\):\n");
+     function(actor_Mr_jack);
+
+     ways_pos();
+  seen();
+  struct node *counter1;
+    for(counter1=head;counter1!= NULL ;counter1=counter1->next)
+        if(counter1->member.way==1)
+           counter1->member.way=2;
+    print();
+    int b=0;
+    struct node *counter22;
+    for(counter22=head;counter22!= NULL ;counter22=counter22->next)
+        if(counter22->member.way==2)
+          b++;
+    if(b==8)
+     {printf("detectives are win. \nfind Mr.jack.\nEnd.\n");
+     return 0;}
+
+    if(hourglass1>=6)
+   {printf("Mr.jack wins because he has 6 hourglasses.\nEnd.\n");
+    return 0;
+    }
+ printf("Do you want to save the game?(if yes enter 1 else enter 0)\n");
+   int ans1;
+   scanf("%d",&ans1);
+   if(ans1==1)
+     {save_game(q);
+      system("cls");
+      printf("The game was successfully saved.\n");
+      return ;}
+     round++;
+     continue;
+     }
+}}
  ways_pos();
  seen();
  struct node *counter2;
@@ -227,6 +309,72 @@ continue;
            counter2->member.way=2;
    end();
 
+
+
+
+}
+void save_game(int q)
+{ char address[100];
+ char check_address[100][100];
+ int control_file_name=1;
+ FILE *fq=fopen("name_game","r");
+   if(fq==NULL)
+   {
+    // fp=fopen("name_game","w");
+     control_file_name=0;
+   }
+
+   if(control_file_name==1)
+   { while(1)
+       {fscanf(fq,"%s",check_address[control]);
+        control++;
+        if(feof(fq))
+            break;
+       }
+   }
+
+
+ int j;
+ printf("Enter the name of the game to save :\n");
+ do{j=1;
+  fflush(stdin);
+  scanf("%s",address);
+  strcpy(check_address[control],address);
+  for(int i=0;i<control;i++)
+    if(strcmp(address,check_address[i])==0)
+     {printf("This name exists.\nPlease enter another name.\n");
+       j=0;
+     }
+
+  }while(j==0);
+  control++;
+
+     fq=fopen("name_game","w");
+      for(int i=0;i<control;i++)
+        fprintf(fq,"%s\n",check_address[i]);
+  fclose(fq);
+
+
+
+
+
+  FILE *fp=fopen(address,"w");
+if(fp == NULL){
+    printf("Cannot open file\n");
+     return ;
+       }
+
+       fprintf(fp,"%d\n",2*q+round);
+
+    struct node *counter;
+    for(counter=head;counter!= NULL; counter= counter ->next)
+         fprintf(fp,"%s %d %d %d %d %d\n",counter->member.name,counter->member.location,counter->member.direction,counter->member.hide_identity,counter->member.way,counter->member.mr_jack);
+
+    for(int k=0;k<3;k++)
+    fprintf(fp,"%s %d\n",cop[k],cop[k].location_cop);
+    fprintf(fp,"%d\n",hourglass1);
+
+    fclose(fp);
 
 
 
