@@ -99,6 +99,8 @@ scanf("%d",&ans);
     load_game();
   if(ans==3)
     return 0;
+
+    printf("**\n");
 }
 
 }
@@ -129,6 +131,8 @@ struct node *counter;
 
         int q=0;
         play_game(q);
+
+        return ;
 
 }
 
@@ -223,6 +227,7 @@ if(round==1)
 
 
   play_game(round1);
+  return ;
 
 
 }
@@ -290,13 +295,13 @@ if(round==1)
           b++;
     if(b==8)
      {printf("detectives are win. \nfind Mr.jack.\nEnd.\n");
-      sleep(8000);
+      sleep(10);
       system("cls");
      return ;}
 
     if(hourglass1>=6)
    {printf("Mr.jack wins because he has 6 hourglasses.\nEnd.\n");
-    sleep(8000);
+    sleep(10);
     system("cls");
     return ;
     }
@@ -374,6 +379,8 @@ if(round%2==0)
         if(counter2->member.way==1)
            counter2->member.way=2;
    end();
+
+   return ;
 
 
 
@@ -1194,16 +1201,46 @@ if(e1!=1 &&e1!=2 &&e1!=3 && p==6)
     }
 
 
+
     for(int i=10;i>=8;i--)
     {printf("      ");
+     int z=0;
   if(cop[0].location_cop==i)
-     printf("HOL");
-   else if(cop[1].location_cop==i)
+     {printf("HOL");
+    z++;
+     }
+
+
+    if(cop[1].location_cop==i)
+     {if(z!=0)
+      {printf("\n");
+      if(i==10)
+        printf("      ");
+       if(i==9)
+        printf("               ");
+        if(i==8)
+        printf("                        ");
+      }
+
      printf("WAT");
-  else if(cop[2].location_cop==i)
-     printf("TOB");
-     else
-        printf("   ");}
+     z++;
+     }
+
+   if(cop[2].location_cop==i)
+     {if(z!=0)
+      {printf("\n");
+      if(i==10)
+        printf("      ");
+       if(i==9)
+        printf("               ");
+        if(i==8)
+            printf("                        ");
+      }printf("TOB");
+     z++;
+     }
+     if(cop[0].location_cop!=i && cop[1].location_cop!=i && cop[2].location_cop!=i)
+        printf("   ");
+    }
 
         printf("\n");
 
