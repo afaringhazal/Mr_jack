@@ -87,6 +87,14 @@ void play_game();
 void save_game(int);
 void load_game();
 
+
+//score section :)
+int bot[2];
+int choose_bot();
+int choose_bot_move();
+int choose_bot_tile();
+int choose_bot_rotate();
+
 int main()
 {printf("Welcome to Mr. Jack\n");
 while(1)
@@ -98,6 +106,7 @@ scanf("%d",&ans);
     {new_game();
     control_head++;
     round=1;
+    hourglass1=0;
     }
 
   if(ans==2)
@@ -114,7 +123,33 @@ scanf("%d",&ans);
 
 
 void new_game()
-{identity_tile();
+{printf("1- play with bot\n2-play with friend\n");
+int n;
+do{
+scanf("%d",&n);
+if(n==1)
+    bot[0]=1;
+if(n==2)
+    bot[0]=0;
+if(n!=1 && n!=2)
+    printf("Enter correct number plz.\n");
+}while(n!=1 && n!=2);
+
+if(bot[0]==1)
+{do{printf("Which role will the robot play?\n1-Mr.jack\n2-cops\n");
+ int n;
+ scanf("%d",&n);
+ if(n==1)
+    bot[1]=0;
+ if(n==2)
+    bot[1]=1;
+ if(n!=1 && n!=2)
+    printf("Enter correct number plz.\n");
+
+}while(n!=1 && n!=2);
+}
+
+identity_tile();
 identity_cop();
 identity_action();
 random_action();
@@ -191,6 +226,8 @@ list1 =fill_list(member1);
    }
 
    fscanf(qq,"%d",&hourglass1);
+   fscanf(qq,"%d",&bot[0]);
+   fscanf(qq,"%d",&bot[1]);
    int r=0;
      if(round==1)
       {fscanf(qq,"%d",&random_action_card[0]);
@@ -383,6 +420,8 @@ if(round%2==0)
         if(counter2->member.way==1)
            counter2->member.way=2;
    end();
+   sleep(13);
+   system("cls");
 
    return ;
 
@@ -443,6 +482,9 @@ if(fp == NULL){
     for(int k=0;k<3;k++)
     fprintf(fp,"%s %d\n",cop[k],cop[k].location_cop);
     fprintf(fp,"%d\n",hourglass1);
+    fprintf(fp,"%d\n",bot[0]);
+    fprintf(fp,"%d\n",bot[1]);
+
 
     if(round==1)
       {fprintf(fp,"%d\n",random_action_card[0]);
@@ -538,7 +580,8 @@ for(int i=0;i<4;i++)
 void function(int actor)
 { int number;
   int input_repeat_bug1;
-    do{
+   if(bot[0]==0 || (bot[0]==1 && bot[1]!=actor))
+    {do{
     input_repeat_bug1=0;
 
     scanf("%d",&number);
@@ -554,6 +597,28 @@ void function(int actor)
     if(number>4 || number<1)
         printf("Error!!!\nEnter again plz.\n");
      }while(number>4 || number<1 || input_repeat_bug1==1);
+     }
+     else
+     {do{
+    input_repeat_bug1=0;
+
+   // scanf("%d",&number);
+    number=choose_bot();
+
+    input_repeat_bug[xx]=number;
+    for(int i=xx-1;i>=0;i--)
+        if(number==input_repeat_bug[i])
+           input_repeat_bug1=1;
+
+     /*if(input_repeat_bug1==1)
+        printf("This action has been used before.\nEnter again plz.\n");
+
+    if(number>4 || number<1)
+        printf("Error!!!\nEnter again plz.\n");*/
+     }while(number>4 || number<1 || input_repeat_bug1==1);
+     }
+
+
         play_action_chase(state[number-1],number-1,actor);
     if(round==1)
        {number_state[number-1]=number;
@@ -652,10 +717,16 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
 
     printf("how many moves do you want?\(1 or 2\)\n");
     int m;
-    do{scanf("%d",&m);
+
+
+    if(bot[0]==0 || (bot[0]==1 && bot[1]!=actor))
+      {do{scanf("%d",&m);
         if(m>2 || m <1)
             printf("Error!!!\nEnter again plz.\n");
       }while(m>2 || m<1);
+      }
+      else
+        m=choose_bot_move();
 
     cop[j].location_cop+=m;
     if(cop[j].location_cop>12)
@@ -664,11 +735,15 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
         print();
         return ;
     }
+
+
    if((strcmp(state1.name[i],"turn1")==0) || (strcmp(state1.name[i],"turn2")==0))
     {printf("Which card do you choose to rotate?\(Enter number 1 or 2 ... 9\)\n");
      int rotate;
       int check22;
-     do{ check22=1;
+
+      if(bot[0]==0 || (bot[0]==1 && bot[1]!=actor))
+       {do{check22=1;
          fflush(stdin);
          scanf("%d",&rotate);
          check2[kk]=rotate;
@@ -683,15 +758,42 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
         if(rotate<1 || rotate>9)
               printf("Error!!!\nEnter again plz.\nInvalid number.\n");
 
-       }while(check22==0 || rotate<1 ||rotate>9);
+       }while(check22==0 || rotate<1 ||rotate>9);}
+
+       else{
+
+        do{check22=1;
+         /*fflush(stdin);
+         scanf("%d",&rotate);*/
+         rotate=choose_bot_tile();
+         check2[kk]=rotate;
+         check2[kk+2]=round;
+         if(kk==1)
+         {if(check2[3]==check2[2])
+             {if(check2[1]==check2[0])
+               {//printf("Error!!!\nEnter again plz.\nYou can't rotate a card twice in one round.\n");
+                 check22=0;}}
+            kk=0;
+         }
+        /*if(rotate<1 || rotate>9)
+              printf("Error!!!\nEnter again plz.\nInvalid number.\n");
+              */
+       }while(check22==0 /*|| rotate<1 ||rotate>9*/);
+        }
+
     kk++;
     printf("How much do you want rotate?\n1\)90  2\)180 3\)270\n\(enter 1 or 2 or 3\)\n");
      int m;
-     do{
+
+
+     if(bot[0]==0 || (bot[0]==1 && bot[1]!=actor))
+       {do{
         scanf("%d",&m);
         if(m>3 || m<1)
             printf("Error!!!\nEnter again plz.\n");
-       }while(m>3 || m<1);
+       }while(m>3 || m<1);}
+       else
+        m=choose_bot_rotate();
 
     struct node *counter;
     for(counter=head[control_head];counter!= NULL ;counter=counter->next)
@@ -715,7 +817,9 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
      {printf("which cards do you want to swap?\(enter number 1 or 2 ... 9\)\n");
       int swap1;
       int swap2;
-   while(1)
+
+      if(bot[0]==0 || (bot[0]==1 && bot[1]!=actor))
+     {while(1)
     {do{ //fflush(stdin);
      scanf("%d",&swap1);
     if(swap1<1 ||swap1>9)
@@ -732,6 +836,15 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
      else
         printf("The two numbers entered are the same.\nEnter again plz.\n");
 
+    }}
+    else
+    {
+        while(1)
+        {swap1=choose_bot_tile();
+         swap2=choose_bot_tile();
+            if(swap1!=swap2)
+              break;
+        }
     }
 
 
@@ -761,18 +874,31 @@ if(strcmp(state1.name[i],"cops")==0)
     {int m;
     if(actor==0)
      {printf("enter 1\)Holmes  2\)Watson 3\)Toby 4\)don't change \(Enter number 1 or 2 or 3 or 4\)\n");
-        do{scanf("%d",&m);
+
+
+
+     if(bot[0]==0 || (bot[0]==1 && bot[1]!=actor))
+      {do{scanf("%d",&m);
             if(m>4 || m<1)
             printf("Wrong!!!\nEnter again:\n");
           }while(m>4 || m<1);
      }
+     else
+        m=choose_bot();
+     }
 
       if(actor==1)
              {printf("enter 1\)Holmes  2\)Watson 3\)Toby \(Enter number 1 or 2 or 3 \) \n");
-               do{scanf("%d",&m);
+
+
+            if(bot[0]==0 || (bot[0]==1 && bot[1]!=actor))
+               {do{scanf("%d",&m);
                    if(m>3 || m<1)
                      printf("Wrong!!!\nEnter again:\n");
                  }while(m>3 ||m<1);
+             }
+             else
+                m=choose_bot_rotate();//because this function return 1 or 2 or 3
              }
 
         if(m==1)
@@ -1589,7 +1715,7 @@ struct node *counter;
    if(n==8)
         printf("Detectives is win.\nEnd\n");
    else
-    printf("Mr jack is win.\nEnd\n");
+    printf("Mr jack don't find after 8 round.\nMr.jack is win.\nEnd\n");
 
 
 
@@ -1599,6 +1725,41 @@ struct node *counter;
 
 
 
+
+//score section
+int  choose_bot()
+{
+  int s ;
+  srand(time(0)*time(0));
+  s=rand()%4+1;
+  return s;
+
+}
+
+int  choose_bot_move()
+{
+  int s ;
+  srand(time(0)*time(0));
+  s=rand()%2+1;
+  return s;
+
+}
+int  choose_bot_tile()
+{
+  int s ;
+  srand(time(0)*time(0));
+  s=rand()%9+1;
+  return s;
+
+}
+int  choose_bot_rotate()
+{
+  int s ;
+  srand(time(0)*time(0));
+  s=rand()%3+1;
+  return s;
+
+}
 
 
 
