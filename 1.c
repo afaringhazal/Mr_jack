@@ -4,6 +4,26 @@
 #include<string.h>
 #include<windows.h>
 
+
+typedef enum
+{
+    BLACK = 0, BLUE = 1, GREEN = 2,
+    AQUA = 3, RED = 4, PURPLE = 5,
+    YELLOW = 6, WHITE = 7, GRAY = 8,
+    LIGHT_BLUE = 9, LIGHT_GREEN = 10,
+    LIGHT_AQUA = 11, LIGHT_RED = 12,
+    LIGHT_PURPLE = 13, LIGHT_YELLOW = 14,
+    LIGHT_WHITE = 15
+} ConsoleColors;
+typedef HANDLE Handle;
+typedef CONSOLE_SCREEN_BUFFER_INFO BufferInfo;
+typedef WORD Word;
+short setTextColor(const ConsoleColors foreground);
+
+
+
+//start
+
 struct tile{
   char name[10];
   int location;
@@ -123,7 +143,7 @@ scanf("%d",&ans);
 
 
 void new_game()
-{printf("1- play with bot\n2-play with friend\n");
+{printf("1- play with bot\n2- play with friend\n");
 int n;
 do{
 scanf("%d",&n);
@@ -601,8 +621,6 @@ void function(int actor)
      else
      {do{
     input_repeat_bug1=0;
-
-   // scanf("%d",&number);
     number=choose_bot();
 
     input_repeat_bug[xx]=number;
@@ -610,11 +628,6 @@ void function(int actor)
         if(number==input_repeat_bug[i])
            input_repeat_bug1=1;
 
-     /*if(input_repeat_bug1==1)
-        printf("This action has been used before.\nEnter again plz.\n");
-
-    if(number>4 || number<1)
-        printf("Error!!!\nEnter again plz.\n");*/
      }while(number>4 || number<1 || input_repeat_bug1==1);
      }
 
@@ -653,7 +666,6 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
      char name_lens[9][10];
     struct node *counter;
     for(counter=head[control_head];counter!= NULL ;counter=counter->next)
-        //if(counter->member.way!=2)
           if(counter->member.hide_identity!=1)
             if(counter->member.mr_jack!=1)
              {strcpy(name_lens[k],counter->member.name);
@@ -747,13 +759,17 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
          fflush(stdin);
          scanf("%d",&rotate);
          check2[kk]=rotate;
+         //printf("check2[%d]:%d\n",kk,check2[kk]);
          check2[kk+2]=round;
+          //printf("check2[%d]:%d\n",kk+2,check2[kk+2]);
          if(kk==1)
          {if(check2[3]==check2[2])
              {if(check2[1]==check2[0])
                {printf("Error!!!\nEnter again plz.\nYou can't rotate a card twice in one round.\n");
-                 check22=0;}}
-            kk=0;
+                 check22=0;
+                 }}
+            if(check22!=0)
+            kk=-1;
          }
         if(rotate<1 || rotate>9)
               printf("Error!!!\nEnter again plz.\nInvalid number.\n");
@@ -763,22 +779,18 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
        else{
 
         do{check22=1;
-         /*fflush(stdin);
-         scanf("%d",&rotate);*/
          rotate=choose_bot_tile();
          check2[kk]=rotate;
          check2[kk+2]=round;
          if(kk==1)
          {if(check2[3]==check2[2])
              {if(check2[1]==check2[0])
-               {//printf("Error!!!\nEnter again plz.\nYou can't rotate a card twice in one round.\n");
-                 check22=0;}}
-            kk=0;
+               {
+                   check22=0;}}
+           if(check22!=0)
+            kk=-1;
          }
-        /*if(rotate<1 || rotate>9)
-              printf("Error!!!\nEnter again plz.\nInvalid number.\n");
-              */
-       }while(check22==0 /*|| rotate<1 ||rotate>9*/);
+       }while(check22==0);
         }
 
     kk++;
@@ -820,13 +832,13 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
 
       if(bot[0]==0 || (bot[0]==1 && bot[1]!=actor))
      {while(1)
-    {do{ //fflush(stdin);
+    {do{
      scanf("%d",&swap1);
     if(swap1<1 ||swap1>9)
      printf("Error!!!\nEnter again plz.\nInvalid number.\n");
     }while(swap1<1 ||swap1>9);
 
- do{ // fflush(stdin);
+ do{
         scanf("%d",&swap2);
          if(swap2<1 ||swap2>9)
            printf("Error!!!\nEnter again plz.\n");
@@ -1067,19 +1079,21 @@ while(p!=9)
    {for(int k=0;k<3;k++)
     {printf("   ");
      for(int j=p;j<p+3;j++)
-         {printf("   ");
-          printf(" ");
+         {printf("    ");
+         // printf(" ");
         if(n[j]==1 || n[j]==3 || n[j]==4)
-        {
+        { setTextColor(LIGHT_BLUE);
             printf("|");
+          setTextColor(LIGHT_WHITE);
         }
         if(n[j]==2)
-         {
+         {setTextColor(LIGHT_RED);
            printf("*");
+            setTextColor(LIGHT_WHITE);
          }
-         printf(" ");
+        // printf(" ");
 
-     printf("   ");
+     printf("    ");
 
     }
     printf("\n");}
@@ -1138,17 +1152,29 @@ int e2=0;
 
 for(int j=p;j<p+3;j++)
         {if(n[j]==1)
+         {setTextColor(LIGHT_RED);
          printf("***");
+        setTextColor(LIGHT_WHITE);
+         }
        if(n[j]==2 || n[j]==4||n[j]==3)
+        {setTextColor(LIGHT_BLUE);
         printf("---");
+        setTextColor(LIGHT_WHITE);
+        }
     if(way2[j]==2)
         printf("   ");
      else
         printf("%s",m[j]);
 if(n[j]==1||n[j]==2||n[j]==4)
+    {setTextColor(LIGHT_BLUE);
          printf("---");
+    setTextColor(LIGHT_WHITE);}
          if(n[j]==3)
+         {setTextColor(LIGHT_RED);
          printf("***");
+         setTextColor(LIGHT_WHITE);
+
+         }
     }
 
 
@@ -1313,12 +1339,14 @@ if(e1!=1 &&e1!=2 &&e1!=3 && p==6)
          {printf("   ");
           printf(" ");
         if(n[j]==1 || n[j]==2 || n[j]==3)
-        {
+        {  setTextColor(LIGHT_BLUE);
             printf("|");
+            setTextColor(LIGHT_WHITE);
         }
         if(n[j]==4)
-         {
+         {setTextColor(LIGHT_RED);
            printf("*");
+           setTextColor(LIGHT_WHITE);
          }
          printf(" ");
 
@@ -1762,5 +1790,18 @@ int  choose_bot_rotate()
 }
 
 
+//Coloring code
+
+
+short setTextColor(const ConsoleColors foreground)
+{
+    Handle consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    BufferInfo bufferInfo;
+    if(!GetConsoleScreenBufferInfo(consoleHandle, &bufferInfo))
+        return 0;
+    Word color = (bufferInfo.wAttributes & 0xF0) + (foreground & 0x0F);
+    SetConsoleTextAttribute(consoleHandle, color);
+    return 1;
+}
 
 
