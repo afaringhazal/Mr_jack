@@ -716,13 +716,13 @@ void play_action_chase(struct action state1,int number,int actor)//the first pha
       int swap1;
       int swap2;
    while(1)
-    {do{ fflush(stdin);
+    {do{ //fflush(stdin);
      scanf("%d",&swap1);
     if(swap1<1 ||swap1>9)
      printf("Error!!!\nEnter again plz.\nInvalid number.\n");
     }while(swap1<1 ||swap1>9);
 
- do{    fflush(stdin);
+ do{ // fflush(stdin);
         scanf("%d",&swap2);
          if(swap2<1 ||swap2>9)
            printf("Error!!!\nEnter again plz.\n");
